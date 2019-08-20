@@ -314,7 +314,13 @@ class Insured::FamiliesController < FamiliesController
   private
 
   def display_all_hbx_enrollments
-    @all_hbx_enrollments_for_admin = @family.enrollments.order(
+    #  @hbx_enrollments in the "home" method is calling @family.enrollments
+    # which appears to be in the census_employee model. This is getting absolutely all the
+    # hbx enrollments, directly from the HbxEnrollment model
+    @all_hbx_enrollments_for_admin = HbxEnrollment.where(
+      family_id: @family.id,
+      :"product_id".nin => [nil]
+    ).order(
       effective_on: :desc,
       submitted_at: :desc, coverage_kind: :desc
     )

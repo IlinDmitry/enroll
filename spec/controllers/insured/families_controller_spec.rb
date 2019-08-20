@@ -55,7 +55,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       has_multiple_roles?: false
     )
   end
-  let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
+  let(:family) { instance_double(Family, active_household: household, :model_name => "Family", id: 1) }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }

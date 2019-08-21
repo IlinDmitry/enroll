@@ -9,7 +9,7 @@
 <% enrollment_hidden_on_load_css_clas = included_in_original_enrollment_scope == true ? nil : "hidden" %>
 <% initially_hidden_enrollment_css_class = enrollment_hidden_on_load_css_clas == true ? nil : "initially_hidden_enrollment" %>
 
-<div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %> <%= hidden_enrollment_css_class %>">
+<div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %> <%= enrollment_hidden_on_load_css_clas %>">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
       <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> Coverage

@@ -73,5 +73,89 @@ module Notifier
         expect(subject).to have_received(:store_paper_notice)
       end
     end
+
+    describe 'notice builder methods' do
+      let(:notice_number) {"IVL_PRE"}
+      let(:title) {"Update your information at DC Health Link by October 15"}
+      let(:description) {"Notice to be sent out to individuals with AQHP(Assisted)/UQHP(Unassisted)"}
+      let(:event_name) {"projected_eligibility_notice"}
+      let(:market_kind) {"aca_individual"}
+      let(:resource) {ConsumerRole.new}
+      let(:recipient) {Notifier::MergeDataModels::ConsumerRole}
+      let(:raw_body) {'TEST_RAW_BODY'}
+
+      let(:subject) {Notifier::NoticeKind.new(notice_number: notice_number,
+                                              title: title,
+                                              description: description,
+                                              event_name: event_name,
+                                              market_kind: market_kind,
+                                              resource: resource,
+                                              recipient: recipient,
+                                              template: {raw_body: raw_body})}
+
+      before(:each) do
+        subject.resource = resource
+      end
+
+      it "should have valid_resource" do
+        expect(subject.has_valid_resource?).to eq(true)
+      end
+
+      it "should have not valid_resource" do
+        subject.resource = nil
+        expect(subject.has_valid_resource?).to eq(false)
+      end
+
+      it "should have sub_resource" do
+        expect(subject.sub_resource?).to eq(true)
+      end
+
+      it "should have not sub_resource" do
+        subject.resource = nil
+        expect(subject.sub_resource?).to eq(false)
+      end
+    end
+
+
+    describe '.generate_pdf_notice' do
+      let(:notice_number) {"IVL_PRE"}
+      let(:title) {"Update your information at DC Health Link by October 15"}
+      let(:description) {"Notice to be sent out to individuals with AQHP(Assisted)/UQHP(Unassisted)"}
+      let(:event_name) {"projected_eligibility_notice"}
+      let(:market_kind) {"aca_individual"}
+      let(:resource) {ConsumerRole.new}
+      let(:recipient) {Notifier::MergeDataModels::ConsumerRole}
+      let(:raw_body) {'TEST_RAW_BODY'}
+
+      let(:subject) {Notifier::NoticeKind.new(notice_number: notice_number,
+                                              title: title,
+                                              description: description,
+                                              event_name: event_name,
+                                              market_kind: market_kind,
+
+                                              recipient: recipient,
+                                              template: {raw_body: raw_body})}
+      let (:file) {"#{Rails.root}/tmp/#{subject.title.titleize.gsub(/\s+/, '_')}_#{subject.notice_recipient.hbx_id}.pdf"}
+
+      before(:each) do
+        subject.generate_pdf_notice
+      end
+
+      it "pdf file exists" do
+        subject.generate_pdf_notice
+        expect(File.exist?(file)).to eq(true)
+      end
+
+      it "pdf file have 9 pages" do
+        page_analysis = PDF::Inspector::Page.analyze_file(file)
+        expect(page_analysis.pages.size).to eq(9)
+      end
+
+      it "pdf file has text from raw body" do
+        text_analysis = PDF::Inspector::Text.analyze_file(file)
+        content_string = text_analysis.strings.join(" ")
+        expect(content_string).to include(raw_body)
+      end
+    end
   end
 end
